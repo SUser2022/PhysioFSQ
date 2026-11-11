@@ -1,0 +1,10 @@
+task: bidmc_hr
+modality: ppg
+task_type: regression
+output_dim: 1
+label_units: beats/min
+regression_loss: l1
+backbone_lr: 1.0e-5
+readout_lr: 2.0e-4
+head_dropout: 0.1
+weight_decay: 1.0e-2

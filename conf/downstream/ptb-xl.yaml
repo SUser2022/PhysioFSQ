@@ -1,0 +1,10 @@
+task: ptb-xl
+modality: ecg
+task_type: multilabel
+output_dim: 5
+label_units: binary diagnostic superclass indicators
+label_columns: [CD, HYP, MI, NORM, STTC]
+backbone_lr: 3.0e-5
+readout_lr: 1.0e-4
+head_dropout: 0.3
+weight_decay: 1.0e-2

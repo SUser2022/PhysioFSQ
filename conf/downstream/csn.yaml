@@ -1,0 +1,9 @@
+task: csn
+modality: ecg
+task_type: multilabel
+output_dim: 94
+label_units: binary SNOMED-CT class indicators
+backbone_lr: 3.0e-5
+readout_lr: 1.0e-4
+head_dropout: 0.1
+weight_decay: 1.0e-4

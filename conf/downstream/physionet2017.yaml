@@ -1,0 +1,10 @@
+task: physionet2017
+modality: ecg
+task_type: multiclass
+output_dim: 4
+label_units: class index (N=0, A=1, O=2, ~=3)
+label_columns: [N, A, O, "~"]
+backbone_lr: 3.0e-5
+readout_lr: 1.0e-4
+head_dropout: 0.3
+weight_decay: 1.0e-2

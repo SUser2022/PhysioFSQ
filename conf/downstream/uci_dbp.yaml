@@ -1,0 +1,10 @@
+task: uci_dbp
+modality: ppg
+task_type: regression
+output_dim: 1
+label_units: mmHg
+regression_loss: l1
+backbone_lr: 1.0e-5
+readout_lr: 1.0e-4
+head_dropout: 0.3
+weight_decay: 1.0e-2

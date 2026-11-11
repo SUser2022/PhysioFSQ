@@ -1,0 +1,119 @@
+project:
+  name: CMSSL-RFSQ-MR-frequency-FSQ
+  version: band_rmsnorm_v1
+  root: ${hydra:runtime.cwd}
+experiment:
+  name: student_band_rmsnorm_ecg_seed42_fast_cached_q
+  stage: student
+data:
+  val_file: null
+  prepared_dir: ${oc.env:PULSEDB_ROOT}
+  batch_size: 128
+  num_workers: 4
+  num_patches: 50
+  patch_size: 25
+  stride: 1250
+  val_split: 0.1
+  seed: 42
+  shard_size: 16384
+  auto_prepare: false
+  force_rebuild: false
+  pin_memory: true
+  persistent_workers: true
+  prefetch_factor: 2
+  cuda_prefetch: false
+  cuda_prefetch_depth: 1
+  sampling_mode: shard_sequential
+  subset_fraction_train: 1.0
+  subset_fraction_val: 1.0
+trainer:
+  accelerator: auto
+  devices: 1
+  precision: bf16-mixed
+  max_epochs: 200
+  max_steps: -1
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  strategy: auto
+  log_every_n_steps: 50
+  check_val_every_n_epoch: 1
+  val_check_interval: null
+  enable_progress_bar: false
+  enable_model_summary: false
+  sync_batchnorm: false
+  num_sanity_val_steps: 0
+early_stopping:
+  enabled: true
+  monitor: val/loss
+  patience: 20
+  mode: min
+  min_delta: 1.0e-07
+checkpoint:
+  dirpath: ${hydra:runtime.cwd}/outputs/pretraining/student_ecg
+  filename: student_ecg
+  monitor: val/loss
+  mode: min
+  save_top_k: 1
+  save_last: true
+  auto_insert_metric_name: false
+logging:
+  dirpath: ${hydra:runtime.cwd}/outputs/pretraining/logs/student_ecg
+  name: student_band_rmsnorm_ecg_seed42_fast_cached_q
+extra_callbacks: []
+resume_from_checkpoint: null
+use_wandb: false
+wandb:
+  project: ${project.name}
+  entity: null
+  name: ${experiment.name}
+  group: band_rmsnorm_v1_fast_cached_seed42
+  tags:
+  - band-rmsnorm
+  - student
+  - ecg
+  - seed42
+  id: null
+  resume: never
+  mode: online
+  log_model: false
+  save_dir: ${hydra:runtime.cwd}/logs/wandb
+model:
+  _target_: src.models.frequency_student.FrequencyFSQStudent
+  teacher_checkpoint: ${oc.env:PHYSIOFSQ_TEACHER_CHECKPOINT,${hydra:runtime.cwd}/checkpoints/teacher.ckpt}
+  num_bands: 4
+  band_metadata: null
+  encoder_input_channel: 0
+  input_representation: wavelet_bands
+  input_band_channel_divisors: null
+  patch_size: 25
+  num_patches: 50
+  embed_dim: 256
+  num_layers: 12
+  num_heads: 8
+  drop_rate: 0.1
+  learning_rate: 0.0001
+  weight_decay: 1.0e-05
+  mask_ratio: 0.0
+  input_normalization: band_rmsnorm
+  input_rmsnorm_eps: 1.0e-06
+  teacher_q_cache_dir: ${hydra:runtime.cwd}/artifacts/teacher_q_cache
+  teacher_q_cache_prepared_dir: ${data.prepared_dir}
+  teacher_q_cache_allow_smoke: false
+training_acceleration:
+  wavelet_response_cache: true
+  fused_adamw: true
+  compile: true
+  compile_mode: default
+  train_diagnostics_interval: 100
+profile:
+  enabled: false
+  warmup_steps: 10
+  log_every_n_steps: 20
+  output_jsonl: ${hydra:runtime.output_dir}/training_profile.jsonl
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${hydra:runtime.cwd}/outputs/runs/${experiment.name}/${now:%Y%m%d_%H%M%S}

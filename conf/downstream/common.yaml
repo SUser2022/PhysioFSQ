@@ -1,0 +1,53 @@
+schema: physiofsq-downstream-v1
+
+architecture:
+  bands: 4
+  band_feature_dim: 128
+  readout: concat_mlp
+  gru:
+    input_dim: 512
+    hidden_size: 256
+    num_layers: 1
+    bidirectional: false
+  gru_projection_dim: 512
+  mlp:
+    hidden_dim: 256
+    activation: gelu
+  trainable_backbone_scope: final_temporal_transformer_block
+
+training:
+  seed: 42
+  optimizer: AdamW
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+  fused: false
+  batch_size: 64
+  warmup_epochs: 10
+  max_epochs: 200
+  early_stopping_patience: 20
+  min_delta: 0.0
+  grad_clip_norm: 1.0
+  num_workers: 2
+  cpu_threads: 4
+  normalization: minmax
+  standardize_regression_targets: true
+  selection_monitor: val_loss
+  scheduler:
+    name: ReduceLROnPlateau
+    monitor: val_loss
+    mode: min
+    factor: 0.5
+    patience: 6
+    minimum_lr_ratio: 0.01
+  validation_only_fit: true
+
+data:
+  root_env: DOWNSTREAM_DATA_ROOT
+  dalia_rr_root_env: DALIA_RR_DATA_ROOT
+
+checkpoints:
+  ppg: checkpoints/student_ppg.ckpt
+  ecg: checkpoints/student_ecg.ckpt
+
+outputs:
+  run_root: outputs/runs

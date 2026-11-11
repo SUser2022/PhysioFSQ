@@ -1,0 +1,10 @@
+task: bidmc_rr
+modality: ppg
+task_type: regression
+output_dim: 1
+label_units: breaths/min
+regression_loss: l1
+backbone_lr: 3.0e-6
+readout_lr: 3.0e-5
+head_dropout: 0.0
+weight_decay: 1.0e-2
